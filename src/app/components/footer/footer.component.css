@@ -1,0 +1,25 @@
+.fresh-footer {
+  background: var(--canopy);
+  color: #dce8de;
+}
+.brand-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: white;
+}
+.footer-heading {
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+.footer-links li { margin-bottom: 0.4rem; }
+.footer-links a { color: #cfe0d3; }
+.footer-links a:hover { color: var(--sprout); }
+.text-light-green { color: #b9cdbd; }
+.github-link { color: #cfe0d3; display: inline-flex; align-items: center; gap: 0.4rem; }
+.github-link:hover { color: var(--sprout); }
+.footer-divider { border-color: rgba(255,255,255,0.15); margin: 2rem 0 1rem; }

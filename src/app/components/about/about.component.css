@@ -1,0 +1,19 @@
+.about-hero { background: linear-gradient(180deg, #EAF2E4 0%, var(--husk) 100%); padding-top: 4rem; }
+.lead-text { font-size: 1.15rem; color: #4a5750; max-width: 720px; }
+.tech-section { background: var(--husk); }
+.tech-card h5 { color: var(--canopy); font-family: var(--font-display); }
+.tech-list { list-style: none; padding-left: 0; margin: 0; }
+.tech-list li { padding: 0.3rem 0; color: #556; border-bottom: 1px dashed rgba(31,58,46,0.12); }
+.tech-list li:last-child { border-bottom: none; }
+.objectives-list { list-style: none; padding-left: 0; }
+.objectives-list li {
+  padding: 0.75rem 0 0.75rem 2rem;
+  position: relative;
+  color: #4a5750;
+  border-bottom: 1px solid rgba(31,58,46,0.08);
+}
+.objectives-list li::before {
+  content: "\2713";
+  position: absolute; left: 0;
+  color: var(--leaf); font-weight: 700;
+}

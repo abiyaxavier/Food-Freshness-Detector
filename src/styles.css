@@ -1,0 +1,111 @@
+/* ============================================================
+   FreshEye — Global Design Tokens
+   Theme concept: "the orchard, not the dashboard."
+   A living green identity grounded in ripening/decay, not a
+   generic SaaS palette. Fraunces (display) carries personality
+   in headlines; Work Sans (body) stays clean and legible.
+   ============================================================ */
+
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+  --canopy: #1F3A2E;
+  --leaf: #4F8A5B;
+  --sprout: #9FD68C;
+  --clay: #7A5230;
+  --husk: #F4F2E9;
+  --bark: #2B2620;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Work Sans", system-ui, -apple-system, sans-serif;
+
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --shadow-soft: 0 8px 30px rgba(31, 58, 46, 0.10);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--husk);
+  color: var(--bark);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--canopy);
+  letter-spacing: -0.01em;
+}
+
+a { color: var(--leaf); text-decoration: none; }
+a:hover { color: var(--canopy); }
+
+.btn-fresh {
+  background: var(--leaf);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-fresh:hover {
+  background: var(--canopy);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+.btn-fresh:disabled {
+  background: #b9c9bd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-outline-fresh {
+  background: transparent;
+  border: 1.5px solid var(--leaf);
+  color: var(--canopy);
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+.btn-outline-fresh:hover {
+  background: var(--leaf);
+  color: white;
+}
+
+.card-organic {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(31, 58, 46, 0.06);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--leaf);
+}
+
+.section {
+  padding: 5rem 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 3px solid var(--sprout);
+  outline-offset: 2px;
+}

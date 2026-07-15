@@ -1,0 +1,96 @@
+<section class="section predict-section">
+  <div class="container">
+    <p class="eyebrow text-center mb-2">Try it now</p>
+    <h1 class="text-center mb-5">Upload a photo, get an instant verdict</h1>
+
+    <div class="row justify-content-center gy-4">
+      <!-- Upload / Preview column -->
+      <div class="col-lg-6">
+        <div class="card-organic p-4 h-100">
+          <div
+            class="dropzone"
+            [class.has-image]="previewUrl"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+          >
+            <ng-container *ngIf="!previewUrl">
+              <i class="bi bi-cloud-arrow-up dropzone-icon"></i>
+              <p class="mb-1 fw-semibold">Drag & drop an image here</p>
+              <p class="text-muted small mb-3">or click below to browse</p>
+            </ng-container>
+
+            <img *ngIf="previewUrl" [src]="previewUrl" alt="Selected produce preview" class="preview-image" />
+
+            <label class="btn-outline-fresh mt-3">
+              {{ previewUrl ? 'Choose a different photo' : 'Browse files' }}
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+            </label>
+          </div>
+
+          <div class="d-flex gap-3 mt-4">
+            <button class="btn-fresh flex-grow-1" [disabled]="!selectedFile || isLoading" (click)="predict()">
+              <span *ngIf="!isLoading">Predict Freshness</span>
+              <span *ngIf="isLoading"><span class="spinner-border spinner-border-sm me-2"></span>Analyzing...</span>
+            </button>
+            <button class="btn-outline-fresh" *ngIf="selectedFile" (click)="reset()">Clear</button>
+          </div>
+
+          <div class="alert alert-danger mt-3 mb-0" *ngIf="errorMessage">
+            <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Result column -->
+      <div class="col-lg-5">
+        <div class="card-organic p-4 h-100 d-flex flex-column align-items-center justify-content-center text-center">
+          <ng-container *ngIf="!result && !isLoading">
+            <i class="bi bi-basket3 result-placeholder-icon"></i>
+            <p class="text-muted mb-0">Your result will appear here after prediction.</p>
+          </ng-container>
+
+          <ng-container *ngIf="isLoading">
+            <div class="spinner-border" style="color: var(--leaf); width:3rem; height:3rem;"></div>
+            <p class="text-muted mt-3 mb-0">Running MobileNetV2 inference...</p>
+          </ng-container>
+
+          <ng-container *ngIf="result && !isLoading">
+            <!-- Signature element: freshness gauge, arc colored fresh-green to rotten-brown -->
+            <div class="gauge-wrap" [class.rotten]="result.prediction === 'Rotten'">
+              <svg viewBox="0 0 120 120" class="gauge-svg">
+                <circle cx="60" cy="60" r="54" class="gauge-track" />
+                <circle
+                  cx="60" cy="60" r="54"
+                  class="gauge-fill"
+                  [attr.stroke-dasharray]="339.3"
+                  [attr.stroke-dashoffset]="339.3 - (339.3 * confidenceNumber / 100)"
+                />
+              </svg>
+              <div class="gauge-label">
+                <span class="gauge-percent">{{ confidenceNumber }}%</span>
+                <span class="gauge-caption">confidence</span>
+              </div>
+            </div>
+            <h3 class="mt-4 mb-1" [class.text-rotten]="result.prediction === 'Rotten'">
+              {{ result.prediction }}
+            </h3>
+            <p class="text-muted mb-0">
+              {{ result.prediction === 'Fresh' ? 'Looks good to eat.' : 'This one has likely spoiled.' }}
+            </p>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="mt-5" *ngIf="history.length">
+      <h5 class="mb-3">Recent predictions this session</h5>
+      <div class="d-flex gap-3 flex-wrap">
+        <div class="history-item" *ngFor="let item of history">
+          <img [src]="item.thumbnailUrl" [alt]="item.fileName" />
+          <span class="history-badge" [class.rotten]="item.prediction === 'Rotten'">{{ item.prediction }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

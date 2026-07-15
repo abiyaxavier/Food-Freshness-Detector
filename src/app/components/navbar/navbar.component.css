@@ -1,0 +1,22 @@
+.fresh-nav {
+  background: var(--husk);
+  border-bottom: 1px solid rgba(31, 58, 46, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.brand-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--canopy);
+}
+.nav-link {
+  color: var(--bark);
+  font-weight: 500;
+  padding: 0.5rem 0.9rem !important;
+}
+.nav-link.active {
+  color: var(--leaf);
+  font-weight: 700;
+}

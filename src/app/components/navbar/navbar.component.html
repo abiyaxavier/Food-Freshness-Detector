@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-lg py-3 fresh-nav">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <i class="bi bi-flower1 fs-4" style="color: var(--sprout);"></i>
+      <span class="brand-text">FreshEye</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav ms-auto gap-lg-2 align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/about" routerLinkActive="active">About</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/contact" routerLinkActive="active">Contact</a></li>
+        <li class="nav-item ms-lg-2">
+          <a class="btn-fresh d-inline-block" routerLink="/predict">Try It Now</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

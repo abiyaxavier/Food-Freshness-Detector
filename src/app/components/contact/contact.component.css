@@ -1,0 +1,11 @@
+.contact-hero { background: linear-gradient(180deg, #EAF2E4 0%, var(--husk) 100%); padding-top: 4rem; }
+.avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--leaf);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+}

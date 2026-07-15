@@ -1,0 +1,73 @@
+<section class="section about-hero">
+  <div class="container">
+    <p class="eyebrow mb-2">About the project</p>
+    <h1 class="mb-4">Why teach a machine to smell trouble?</h1>
+    <p class="lead-text mb-0">
+      An estimated third of all food produced globally is wasted — often because
+      spoilage is caught too late, or perfectly good produce is thrown out on
+      suspicion alone. FreshEye explores whether a lightweight vision model can
+      make that judgment call faster and more consistently than the human eye,
+      right from a phone camera.
+    </p>
+  </div>
+</section>
+
+<section class="section bg-white">
+  <div class="container">
+    <div class="row gy-5">
+      <div class="col-lg-6">
+        <h3 class="mb-3"><i class="bi bi-lightbulb me-2" style="color: var(--leaf);"></i>Why AI is useful here</h3>
+        <p class="text-muted">
+          Freshness shows up visually — color shifts, texture breakdown, dark
+          spotting — before it's obvious in smell or touch. A convolutional
+          neural network trained on thousands of labeled examples can pick up
+          on these subtle visual cues consistently, at scale, and instantly,
+          which is exactly the kind of pattern-recognition task deep learning
+          excels at.
+        </p>
+      </div>
+      <div class="col-lg-6">
+        <h3 class="mb-3"><i class="bi bi-database me-2" style="color: var(--leaf);"></i>The dataset</h3>
+        <p class="text-muted">
+          The model is trained on a labeled Fresh/Rotten image dataset (~3,000
+          images) spanning apples, bananas, oranges, tomatoes, mangoes,
+          potatoes, and other common produce — split 80% training, 10%
+          validation, and 10% testing to fairly measure real-world accuracy.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section tech-section">
+  <div class="container">
+    <p class="eyebrow text-center mb-2">Under the hood</p>
+    <h2 class="text-center mb-5">Technology stack</h2>
+    <div class="row gy-4">
+      <div class="col-md-6 col-lg-3" *ngFor="let group of techStack">
+        <div class="tech-card card-organic p-4 h-100">
+          <h5 class="mb-3">{{ group.category }}</h5>
+          <ul class="tech-list">
+            <li *ngFor="let item of group.items">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section objectives-section">
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-7">
+        <h2 class="mb-3">Project objectives</h2>
+        <ul class="objectives-list">
+          <li>Build an end-to-end image classification pipeline using transfer learning.</li>
+          <li>Serve real-time predictions through a REST API built with FastAPI.</li>
+          <li>Deliver a responsive, user-friendly Angular interface for uploads and results.</li>
+          <li>Document the full workflow as a learning resource for future students.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,74 @@
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6">
+        <p class="eyebrow mb-3">Fresh vs. Rotten, decided in a glance</p>
+        <h1 class="hero-title mb-4">Can a photo tell you<br>if it's still good to eat?</h1>
+        <p class="hero-sub mb-4">
+          FreshEye uses a MobileNetV2 deep learning model to look at a single photo
+          of a fruit or vegetable and tell you whether it's fresh or spoiling —
+          the same instinct a shopper uses at the market, automated.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a routerLink="/predict" class="btn-fresh">Try a Prediction <i class="bi bi-arrow-right ms-1"></i></a>
+          <a routerLink="/about" class="btn-outline-fresh">How it works</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-visual">
+          <svg viewBox="0 0 400 400" class="w-100">
+            <circle cx="200" cy="200" r="160" fill="#9FD68C" opacity="0.25"/>
+            <circle cx="150" cy="160" r="70" fill="#4F8A5B"/>
+            <circle cx="260" cy="240" r="55" fill="#7A5230" opacity="0.85"/>
+            <circle cx="230" cy="130" r="34" fill="#9FD68C"/>
+            <path d="M 150 90 Q 165 60 185 85" stroke="#1F3A2E" stroke-width="6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-it-works">
+  <div class="container">
+    <p class="eyebrow text-center mb-2">How it works</p>
+    <h2 class="text-center mb-5">Three steps, one second</h2>
+    <div class="row gy-4">
+      <div class="col-md-4" *ngFor="let step of steps; let i = index">
+        <div class="step-card card-organic p-4 h-100">
+          <div class="step-icon mb-3"><i class="bi {{step.icon}}"></i></div>
+          <h4>{{ step.title }}</h4>
+          <p class="text-muted mb-0">{{ step.text }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-section">
+  <div class="container">
+    <p class="eyebrow text-center mb-2">Why FreshEye</p>
+    <h2 class="text-center mb-5">Built for real produce, real people</h2>
+    <div class="row gy-4">
+      <div class="col-md-6 col-lg-3" *ngFor="let f of features">
+        <div class="feature-card p-4 h-100">
+          <div class="feature-icon mb-3"><i class="bi {{f.icon}}"></i></div>
+          <h5>{{ f.title }}</h5>
+          <p class="text-muted small mb-0">{{ f.text }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section text-center">
+  <div class="container">
+    <h2 class="mb-3">Got produce sitting in your fridge?</h2>
+    <p class="mb-4 text-muted">Upload a photo right now and see what FreshEye thinks.</p>
+    <a routerLink="/predict" class="btn-fresh">Check Freshness Now</a>
+  </div>
+</section>
