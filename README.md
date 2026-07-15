@@ -25,3 +25,22 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+# Food Freshness Detection Using Image Classification
+
+## Team Members
+- Sreelakshmi P
+- Nandana P
+- Abiya Xavier
+- Aswathy Suresh
+
+## Project Description
+This project aims to detect whether fruits and vegetables are fresh or rotten using deep learning and image classification techniques. Users can upload an image, and the system predicts the freshness of the food.
+
+## Technologies
+- Angular
+- Bootstrap
+- Python
+- TensorFlow
+- OpenCV
