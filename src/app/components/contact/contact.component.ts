@@ -15,9 +15,10 @@ import { CommonModule } from '@angular/common';
 })
 export class ContactComponent {
   teamMembers = [
-    { name: 'Your Name', role: 'Team Lead / ML Engineer', initials: 'YN' },
-    { name: 'Teammate Two', role: 'Backend Developer', initials: 'T2' },
-    { name: 'Teammate Three', role: 'Frontend Developer', initials: 'T3' },
+    { name: 'Abiya Xavier', role: 'AI & ML', initials: 'T1' },
+    { name: 'Aswathy Suresh', role: 'Web Design', initials: 'T2' },
+    { name: 'Sreelakshmi P', role: 'Research & Dataset', initials: 'T3' },
+    { name: 'Nandhana P', role: 'Testing & Documentation', initials: 'T2' },
   ];
 
   projectGuide = { name: 'Dr. Guide Name', title: 'Assistant Professor, CSE Department' };

@@ -15,9 +15,9 @@ import { CommonModule } from '@angular/common';
 })
 export class AboutComponent {
   techStack = [
-    { category: 'Frontend', items: ['Angular 18 (standalone)', 'Bootstrap 5', 'TypeScript'] },
+    { category: 'Frontend', items: ['Angular 18 (standalone)', 'HTML5','Bootstrap 5', 'TypeScript'] },
     { category: 'Backend', items: ['Python', 'FastAPI', 'Uvicorn'] },
     { category: 'AI / ML', items: ['TensorFlow', 'Keras', 'MobileNetV2 (Transfer Learning)'] },
-    { category: 'Image Processing', items: ['OpenCV', 'Pillow', 'NumPy'] },
+    { category: 'Image Processing', items: ['MobileNetV2 Preprocessing', 'TensorFlow Image Utilities' , 'Pillow', 'NumPy'] },
   ];
 }
