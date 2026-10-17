@@ -1,19 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PredictionService } from '../../services/prediction.service';
-import { PredictionHistoryItem, PredictionResponse } from '../../models/prediction.model';
 
-/**
- * PredictComponent
- *
- * Purpose:
- *   The core feature page. Handles:
- *     1. File selection + live image preview
- *     2. Sending the file to the backend via PredictionService
- *     3. Showing a loading state while waiting for the API
- *     4. Displaying the result (Fresh/Rotten + confidence)
- *     5. Keeping a local (in-memory) history of past predictions this session
- */
+import { PredictionService } from '../../services/prediction.service';
+
+import {
+  PredictionHistoryItem,
+  PredictionResponse
+} from '../../models/prediction.model';
+
 @Component({
   selector: 'app-predict',
   standalone: true,
@@ -21,95 +15,266 @@ import { PredictionHistoryItem, PredictionResponse } from '../../models/predicti
   templateUrl: './predict.component.html',
   styleUrl: './predict.component.css',
 })
-export class PredictComponent {
+export class PredictComponent implements OnDestroy {
+
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
   isLoading = false;
   errorMessage: string | null = null;
+
   result: PredictionResponse | null = null;
 
   history: PredictionHistoryItem[] = [];
+
   private historyCounter = 0;
 
-  constructor(private predictionService: PredictionService) {}
+  // Keep track of object URLs so they can be released.
+  private createdUrls = new Set<string>();
 
-  /** Triggered when the user picks a file via the input or drag-and-drop */
+  constructor(
+    private predictionService: PredictionService
+  ) {}
+
+  // ===================================
+  // CAMERA AND GALLERY IMAGE SELECTION
+  // ===================================
+
   onFileSelected(event: Event): void {
+
     const input = event.target as HTMLInputElement;
+
     const file = input.files?.[0];
+
     if (!file) return;
+
     this.setFile(file);
+
+    // Allow selecting the same image again.
+    input.value = '';
   }
 
+  // ===================================
+  // DRAG AND DROP
+  // ===================================
+
   onDrop(event: DragEvent): void {
+
     event.preventDefault();
+
+    if (this.isLoading) return;
+
     const file = event.dataTransfer?.files?.[0];
-    if (file) this.setFile(file);
+
+    if (file) {
+      this.setFile(file);
+    }
   }
 
   onDragOver(event: DragEvent): void {
-    event.preventDefault(); // required to allow onDrop to fire
+    event.preventDefault();
   }
+
+  // ===================================
+  // IMAGE VALIDATION AND PREVIEW
+  // ===================================
 
   private setFile(file: File): void {
-    if (!file.type.startsWith('image/')) {
-      this.errorMessage = 'Please choose an image file (JPG, PNG, or WEBP).';
+
+    if (this.isLoading) return;
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+
+      this.errorMessage =
+        'Please select a JPG, PNG, or WEBP image.';
+
       return;
     }
-    this.errorMessage = null;
-    this.result = null;
+
+    const maxSize = 10 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+
+      this.errorMessage =
+        'Image is too large. Maximum size is 10 MB.';
+
+      return;
+    }
+
+    // Release old preview if it is not used by history.
+    if (
+      this.previewUrl &&
+      !this.history.some(
+        item => item.thumbnailUrl === this.previewUrl
+      )
+    ) {
+      this.releaseUrl(this.previewUrl);
+    }
+
     this.selectedFile = file;
-    this.previewUrl = URL.createObjectURL(file); // creates a temporary local URL to preview the image before upload
+
+    this.result = null;
+
+    this.errorMessage = null;
+
+    this.previewUrl = URL.createObjectURL(file);
+
+    this.createdUrls.add(this.previewUrl);
   }
 
-  /** Sends the selected file to the backend and handles the response */
+  // ===================================
+  // AI PREDICTION
+  // ===================================
+
   predict(): void {
-    if (!this.selectedFile) return;
+
+    if (!this.selectedFile || this.isLoading) return;
 
     this.isLoading = true;
+
     this.errorMessage = null;
+
     this.result = null;
 
-    this.predictionService.predictImage(this.selectedFile).subscribe({
+    const file = this.selectedFile;
+    const thumbnailUrl = this.previewUrl;
+
+    this.predictionService.predictImage(file).subscribe({
+
       next: (response) => {
+
         this.result = response;
+
         this.isLoading = false;
-        this.addToHistory(response);
+
+        this.addToHistory(
+          response,
+          file,
+          thumbnailUrl
+        );
       },
+
       error: (err) => {
+
         this.isLoading = false;
-        // FastAPI returns { detail: "..." } on HTTPException; fall back to a generic message otherwise
+
+        const detail = err?.error?.detail;
+
         this.errorMessage =
-          err?.error?.detail ||
-          'Could not reach the prediction server. Make sure the FastAPI backend is running on http://localhost:8000.';
-      },
+          typeof detail === 'string'
+            ? detail
+            : 'Prediction failed. Please check the backend connection.';
+      }
+
     });
   }
 
-  private addToHistory(response: PredictionResponse): void {
-    if (!this.selectedFile || !this.previewUrl) return;
+  // ===================================
+  // PREDICTION HISTORY
+  // ===================================
+
+  private addToHistory(
+    response: PredictionResponse,
+    file: File,
+    thumbnailUrl: string | null
+  ): void {
+
+    if (!thumbnailUrl) return;
+
     this.history.unshift({
+
       id: this.historyCounter++,
-      fileName: this.selectedFile.name,
-      thumbnailUrl: this.previewUrl,
+
+      fileName: file.name,
+
+      thumbnailUrl: thumbnailUrl,
+
       prediction: response.prediction,
+
       confidence: response.confidence,
+
       timestamp: new Date(),
+
     });
-    this.history = this.history.slice(0, 8); // keep only the most recent 8
+
+    // Keep only 8 predictions.
+    const removedItems = this.history.splice(8);
+
+    for (const item of removedItems) {
+      if (item.thumbnailUrl !== this.previewUrl) {
+        this.releaseUrl(item.thumbnailUrl);
+      }
+    }
   }
+
+  // ===================================
+  // CLEAR SELECTED IMAGE
+  // ===================================
 
   reset(): void {
+
+    if (
+      this.previewUrl &&
+      !this.history.some(
+        item => item.thumbnailUrl === this.previewUrl
+      )
+    ) {
+      this.releaseUrl(this.previewUrl);
+    }
+
     this.selectedFile = null;
+
     this.previewUrl = null;
+
     this.result = null;
+
     this.errorMessage = null;
   }
 
-  /** Parses "98.7%" into a number for the gauge's SVG arc calculation */
-  get confidenceNumber(): number {
-    if (!this.result) return 0;
-    return parseFloat(this.result.confidence);
+  // ===================================
+  // RELEASE TEMPORARY IMAGE URL
+  // ===================================
+
+  private releaseUrl(url: string): void {
+
+    if (this.createdUrls.has(url)) {
+
+      URL.revokeObjectURL(url);
+
+      this.createdUrls.delete(url);
+    }
   }
+
+  ngOnDestroy(): void {
+
+    for (const url of this.createdUrls) {
+      URL.revokeObjectURL(url);
+    }
+
+    this.createdUrls.clear();
+  }
+
+  // ===================================
+  // CONFIDENCE GAUGE
+  // ===================================
+
+  get confidenceNumber(): number {
+
+    if (!this.result) return 0;
+
+    const value = parseFloat(
+      String(this.result.confidence)
+    );
+
+    if (!Number.isFinite(value)) return 0;
+
+    return Math.max(0, Math.min(100, value));
+  }
+
 }

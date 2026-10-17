@@ -40,3 +40,21 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+# Python backend
+backend/.venv/
+__pycache__/
+*.pyc
+
+# Dataset
+archive (1)/
+fruit_dataset/
+fruit_dataset.zip
+*.zip
+
+# Trained AI models
+*.keras
+*.h5
+
+# Environment variables
+.env
+.env.*

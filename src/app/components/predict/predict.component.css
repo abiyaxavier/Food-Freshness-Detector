@@ -56,3 +56,51 @@
   padding: 2px 0; border-radius: 6px;
 }
 .history-badge.rotten { background: var(--clay); }
+/* CAMERA AND UPLOAD BUTTONS */
+
+.dropzone button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropzone .btn-fresh,
+.dropzone .btn-outline-fresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 45px;
+  padding: 10px 20px;
+
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.dropzone .btn-fresh:hover {
+  transform: translateY(-2px);
+}
+
+.dropzone .btn-outline-fresh:hover {
+  transform: translateY(-2px);
+}
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 576px) {
+
+  .dropzone .btn-fresh,
+  .dropzone .btn-outline-fresh {
+    width: 100%;
+  }
+
+  .dropzone .d-flex {
+    flex-direction: column;
+  }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+  }
+
+}
