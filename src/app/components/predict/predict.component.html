@@ -1,7 +1,12 @@
 <section class="section predict-section">
+
   <div class="container">
 
-    <p class="eyebrow text-center mb-2">Try it now</p>
+    <!-- PAGE HEADING -->
+
+    <p class="eyebrow text-center mb-2">
+      Try it now
+    </p>
 
     <h1 class="text-center mb-5">
       Scan or upload a photo, get a freshness prediction
@@ -9,8 +14,12 @@
 
     <div class="row justify-content-center gy-4">
 
-      <!-- UPLOAD / CAMERA / PREVIEW COLUMN -->
+      <!-- ================================= -->
+      <!-- IMAGE UPLOAD SECTION -->
+      <!-- ================================= -->
+
       <div class="col-lg-6">
+
         <div class="card-organic p-4 h-100">
 
           <div
@@ -20,7 +29,8 @@
             (dragover)="onDragOver($event)"
           >
 
-            <!-- Before selecting image -->
+            <!-- BEFORE IMAGE SELECTION -->
+
             <ng-container *ngIf="!previewUrl">
 
               <i class="bi bi-camera dropzone-icon"></i>
@@ -37,14 +47,16 @@
             </ng-container>
 
             <!-- IMAGE PREVIEW -->
+
             <img
               *ngIf="previewUrl"
               [src]="previewUrl"
-              alt="Selected produce preview"
+              alt="Selected fruit preview"
               class="preview-image"
             />
 
-            <!-- HIDDEN CAMERA INPUT -->
+            <!-- CAMERA INPUT -->
+
             <input
               type="file"
               accept="image/*"
@@ -54,7 +66,8 @@
               hidden
             />
 
-            <!-- HIDDEN GALLERY INPUT -->
+            <!-- GALLERY INPUT -->
+
             <input
               type="file"
               accept="image/*"
@@ -64,6 +77,7 @@
             />
 
             <!-- CAMERA AND UPLOAD BUTTONS -->
+
             <div class="d-flex gap-3 justify-content-center flex-wrap mt-3">
 
               <button
@@ -72,8 +86,10 @@
                 [disabled]="isLoading"
                 (click)="cameraInput.click()"
               >
+
                 <i class="bi bi-camera-fill me-2"></i>
                 Scan Fruit
+
               </button>
 
               <button
@@ -82,35 +98,106 @@
                 [disabled]="isLoading"
                 (click)="galleryInput.click()"
               >
+
                 <i class="bi bi-image me-2"></i>
+
                 {{ previewUrl ? 'Change Photo' : 'Browse Files' }}
+
               </button>
 
             </div>
 
           </div>
 
+          <!-- ================================= -->
+          <!-- FRUIT SELECTION -->
+          <!-- ================================= -->
+
+          <div class="fruit-selection mt-4">
+
+            <label class="fw-semibold mb-2 d-block">
+              🍎 Select Fruit Type
+            </label>
+
+            <p class="text-muted small mb-3">
+              Choose the fruit shown in your image.
+            </p>
+
+            <div class="d-flex gap-2 flex-wrap">
+
+              <!-- APPLE -->
+
+              <button
+                type="button"
+                class="btn-outline-fresh"
+                [class.active-fruit]="selectedFruit === 'apple'"
+                [disabled]="isLoading"
+                (click)="selectFruit('apple')"
+              >
+                🍎 Apple
+              </button>
+
+              <!-- BANANA -->
+
+              <button
+                type="button"
+                class="btn-outline-fresh"
+                [class.active-fruit]="selectedFruit === 'banana'"
+                [disabled]="isLoading"
+                (click)="selectFruit('banana')"
+              >
+                🍌 Banana
+              </button>
+
+              <!-- ORANGE -->
+
+              <button
+                type="button"
+                class="btn-outline-fresh"
+                [class.active-fruit]="selectedFruit === 'orange'"
+                [disabled]="isLoading"
+                (click)="selectFruit('orange')"
+              >
+                🍊 Orange
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- ================================= -->
           <!-- PREDICTION BUTTONS -->
+          <!-- ================================= -->
+
           <div class="d-flex gap-3 mt-4">
 
             <button
               type="button"
               class="btn-fresh flex-grow-1"
-              [disabled]="!selectedFile || isLoading"
+              [disabled]="!selectedFile || !selectedFruit || isLoading"
               (click)="predict()"
             >
 
               <span *ngIf="!isLoading">
+
                 <i class="bi bi-search me-2"></i>
                 Predict Freshness
+
               </span>
 
               <span *ngIf="isLoading">
-                <span class="spinner-border spinner-border-sm me-2"></span>
+
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+
                 Analyzing...
+
               </span>
 
             </button>
+
+            <!-- CLEAR BUTTON -->
 
             <button
               type="button"
@@ -124,19 +211,36 @@
 
           </div>
 
+          <!-- SELECT FRUIT REMINDER -->
+
+          <p
+            class="text-muted small mt-2 mb-0"
+            *ngIf="selectedFile && !selectedFruit"
+          >
+            Please select a fruit type before predicting.
+          </p>
+
           <!-- ERROR MESSAGE -->
+
           <div
             class="alert alert-danger mt-3 mb-0"
             *ngIf="errorMessage"
           >
+
             <i class="bi bi-exclamation-triangle me-2"></i>
+
             {{ errorMessage }}
+
           </div>
 
         </div>
+
       </div>
 
-      <!-- RESULT COLUMN -->
+      <!-- ================================= -->
+      <!-- PREDICTION RESULT SECTION -->
+      <!-- ================================= -->
+
       <div class="col-lg-5">
 
         <div
@@ -144,7 +248,8 @@
                  align-items-center justify-content-center text-center"
         >
 
-          <!-- Before prediction -->
+          <!-- BEFORE PREDICTION -->
+
           <ng-container *ngIf="!result && !isLoading">
 
             <i class="bi bi-basket3 result-placeholder-icon"></i>
@@ -155,12 +260,13 @@
 
           </ng-container>
 
-          <!-- Loading -->
+          <!-- LOADING -->
+
           <ng-container *ngIf="isLoading">
 
             <div
               class="spinner-border"
-              style="color: var(--leaf); width:3rem; height:3rem;"
+              style="color: var(--leaf); width: 3rem; height: 3rem;"
             ></div>
 
             <p class="text-muted mt-3 mb-0">
@@ -169,15 +275,23 @@
 
           </ng-container>
 
-          <!-- Prediction result -->
+          <!-- ================================= -->
+          <!-- AI PREDICTION RESULT -->
+          <!-- ================================= -->
+
           <ng-container *ngIf="result && !isLoading">
+
+            <!-- CONFIDENCE GAUGE -->
 
             <div
               class="gauge-wrap"
               [class.rotten]="result.prediction === 'Rotten'"
             >
 
-              <svg viewBox="0 0 120 120" class="gauge-svg">
+              <svg
+                viewBox="0 0 120 120"
+                class="gauge-svg"
+              >
 
                 <circle
                   cx="60"
@@ -204,26 +318,32 @@
                 </span>
 
                 <span class="gauge-caption">
-                  confidence
+                  Confidence
                 </span>
 
               </div>
 
             </div>
 
+            <!-- FRESHNESS RESULT -->
+
             <h3
               class="mt-4 mb-1"
               [class.text-rotten]="result.prediction === 'Rotten'"
             >
+
               {{ result.prediction }}
+
             </h3>
 
             <p class="text-muted mb-0">
+
               {{
                 result.prediction === 'Fresh'
                   ? 'This fruit appears visually fresh.'
                   : 'This fruit may show signs of spoilage.'
               }}
+
             </p>
 
             <p class="text-muted small mt-3 mb-0">
@@ -231,15 +351,149 @@
               and cannot guarantee food safety.
             </p>
 
+            <!-- ================================= -->
+            <!-- SHELF LIFE CARD -->
+            <!-- ================================= -->
+
+            <div class="shelf-life-card mt-4 w-100">
+
+              <!-- CARD HEADING -->
+
+              <div class="shelf-life-header">
+
+                <i class="bi bi-calendar-heart"></i>
+
+                <h5>
+                  Freshness & Storage Guide
+                </h5>
+
+              </div>
+
+              <!-- SELECTED FRUIT -->
+
+              <div class="shelf-life-row">
+
+                <span>
+                  🍎 Selected Fruit
+                </span>
+
+                <strong>
+                  {{ fruitName }}
+                </strong>
+
+              </div>
+
+              <!-- FRESHNESS STATUS -->
+
+              <div class="shelf-life-row mt-3">
+
+                <span>
+                  🌿 Freshness Status
+                </span>
+
+                <strong
+                  [class.text-rotten]="result.prediction === 'Rotten'"
+                >
+                  {{ result.prediction }}
+                </strong>
+
+              </div>
+
+              <!-- STORAGE CONDITION -->
+
+              <div class="mt-4">
+
+                <label class="storage-label">
+                  Select Storage Condition
+                </label>
+
+                <div class="storage-options">
+
+                  <!-- ROOM TEMPERATURE -->
+
+                  <button
+                    type="button"
+                    [class.active]="storageCondition === 'room'"
+                    (click)="selectStorage('room')"
+                  >
+
+                    🌤️ Room Temperature
+
+                  </button>
+
+                  <!-- REFRIGERATOR -->
+
+                  <button
+                    type="button"
+                    [class.active]="storageCondition === 'fridge'"
+                    (click)="selectStorage('fridge')"
+                  >
+
+                    ❄️ Refrigerator
+
+                  </button>
+
+                </div>
+
+              </div>
+
+              <!-- ================================= -->
+              <!-- SHELF LIFE RESULT -->
+              <!-- ================================= -->
+
+              <div class="shelf-life-result mt-4">
+
+                <p class="mb-1">
+                  Typical Storage Period
+                </p>
+
+                <h3>
+                  {{ shelfLifeInfo.days }}
+                </h3>
+
+              </div>
+
+              <!-- STORAGE RECOMMENDATION -->
+
+              <div class="storage-advice mt-3">
+
+                <i class="bi bi-lightbulb me-2"></i>
+
+                {{ shelfLifeInfo.advice }}
+
+              </div>
+
+              <!-- SAFETY DISCLAIMER -->
+
+              <p class="shelf-disclaimer mt-3 mb-0">
+
+                ⚠️ These are general storage guidelines,
+                not an AI prediction of the exact number
+                of safe days remaining.
+
+                Actual storage life depends on ripeness,
+                temperature, handling, and existing spoilage.
+
+              </p>
+
+            </div>
+
           </ng-container>
 
         </div>
+
       </div>
 
     </div>
 
+    <!-- ================================= -->
     <!-- PREDICTION HISTORY -->
-    <div class="mt-5" *ngIf="history.length">
+    <!-- ================================= -->
+
+    <div
+      class="mt-5"
+      *ngIf="history.length"
+    >
 
       <h5 class="mb-3">
         Recent predictions this session
@@ -261,7 +515,9 @@
             class="history-badge"
             [class.rotten]="item.prediction === 'Rotten'"
           >
+
             {{ item.prediction }}
+
           </span>
 
         </div>
@@ -271,4 +527,5 @@
     </div>
 
   </div>
+
 </section>

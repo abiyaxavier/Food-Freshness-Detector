@@ -1,4 +1,15 @@
-.predict-section { background: var(--husk); min-height: 70vh; }
+/* ===================================
+   PREDICTION PAGE
+=================================== */
+
+.predict-section {
+  background: var(--husk);
+  min-height: 70vh;
+}
+
+/* ===================================
+   IMAGE UPLOAD
+=================================== */
 
 .dropzone {
   border: 2px dashed rgba(31, 58, 46, 0.25);
@@ -8,10 +19,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
-.dropzone.has-image { border-style: solid; padding: 1.25rem; }
-.dropzone-icon { font-size: 2.6rem; color: var(--leaf); margin-bottom: 0.5rem; }
+
+.dropzone.has-image {
+  border-style: solid;
+  padding: 1.25rem;
+}
+
+.dropzone-icon {
+  font-size: 2.6rem;
+  color: var(--leaf);
+  margin-bottom: 0.5rem;
+}
+
 .preview-image {
   max-width: 100%;
   max-height: 260px;
@@ -19,44 +42,9 @@
   object-fit: cover;
 }
 
-.result-placeholder-icon { font-size: 3rem; color: rgba(31,58,46,0.2); margin-bottom: 0.75rem; }
-
-/* Signature element: the freshness gauge */
-.gauge-wrap { position: relative; width: 140px; height: 140px; }
-.gauge-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.gauge-track { fill: none; stroke: rgba(31,58,46,0.08); stroke-width: 10; }
-.gauge-fill {
-  fill: none;
-  stroke: var(--leaf);
-  stroke-width: 10;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.6s ease;
-}
-.gauge-wrap.rotten .gauge-fill { stroke: var(--clay); }
-.gauge-label {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-}
-.gauge-percent { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--canopy); }
-.gauge-caption { font-size: 0.75rem; color: #8a988e; text-transform: uppercase; letter-spacing: 0.06em; }
-
-.text-rotten { color: var(--clay) !important; }
-
-.history-item { position: relative; width: 84px; }
-.history-item img {
-  width: 84px; height: 84px; object-fit: cover;
-  border-radius: var(--radius-md);
-  border: 2px solid rgba(31,58,46,0.08);
-}
-.history-badge {
-  position: absolute; bottom: 4px; left: 4px; right: 4px;
-  background: var(--leaf); color: white;
-  font-size: 0.65rem; font-weight: 700; text-align: center;
-  padding: 2px 0; border-radius: 6px;
-}
-.history-badge.rotten { background: var(--clay); }
-/* CAMERA AND UPLOAD BUTTONS */
+/* ===================================
+   UPLOAD BUTTONS
+=================================== */
 
 .dropzone button {
   cursor: pointer;
@@ -68,23 +56,259 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-height: 45px;
   padding: 10px 20px;
-
   border-radius: 12px;
   font-weight: 500;
 }
 
-.dropzone .btn-fresh:hover {
-  transform: translateY(-2px);
-}
-
+.dropzone .btn-fresh:hover,
 .dropzone .btn-outline-fresh:hover {
   transform: translateY(-2px);
 }
 
-/* MOBILE RESPONSIVENESS */
+/* ===================================
+   FRUIT SELECTION
+=================================== */
+
+.fruit-selection {
+  background: #f3f8ef;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.fruit-selection button {
+  border-radius: 10px;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+}
+
+.fruit-selection button.active-fruit {
+  background: #285943;
+  color: white;
+  border-color: #285943;
+}
+
+/* ===================================
+   RESULT PLACEHOLDER
+=================================== */
+
+.result-placeholder-icon {
+  font-size: 3rem;
+  color: rgba(31, 58, 46, 0.2);
+  margin-bottom: 0.75rem;
+}
+
+/* ===================================
+   CONFIDENCE GAUGE
+=================================== */
+
+.gauge-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-track {
+  fill: none;
+  stroke: rgba(31, 58, 46, 0.08);
+  stroke-width: 10;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.gauge-wrap.rotten .gauge-fill {
+  stroke: var(--clay);
+}
+
+.gauge-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-percent {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--canopy);
+}
+
+.gauge-caption {
+  font-size: 0.75rem;
+  color: #8a988e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.text-rotten {
+  color: var(--clay) !important;
+}
+
+/* ===================================
+   SHELF LIFE CARD
+=================================== */
+
+.shelf-life-card {
+  background: #f3f8ef;
+  border: 1px solid #dcebd7;
+  border-radius: 18px;
+  padding: 22px;
+  text-align: left;
+  width: 100%;
+}
+
+.shelf-life-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #285943;
+}
+
+.shelf-life-header i {
+  font-size: 24px;
+}
+
+.shelf-life-header h5 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.shelf-life-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: #496457;
+}
+
+.shelf-life-row strong {
+  color: #214d37;
+  text-transform: capitalize;
+}
+
+.storage-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #496457;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.storage-options {
+  display: flex;
+  gap: 10px;
+}
+
+.storage-options button {
+  flex: 1;
+  border: 1px solid #d0dfd2;
+  background: white;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.storage-options button:hover {
+  background: #e5f2e4;
+}
+
+.storage-options button.active {
+  background: #285943;
+  color: white;
+  border-color: #285943;
+}
+
+.shelf-life-result {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+}
+
+.shelf-life-result p {
+  color: #7b9183;
+  font-size: 13px;
+}
+
+.shelf-life-result h3 {
+  color: #285943;
+  font-size: 25px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.storage-advice {
+  background: #e7f1e4;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #375e43;
+  line-height: 1.6;
+}
+
+.shelf-disclaimer {
+  font-size: 11px;
+  color: #849589;
+  line-height: 1.5;
+}
+
+/* ===================================
+   PREDICTION HISTORY
+=================================== */
+
+.history-item {
+  position: relative;
+  width: 84px;
+}
+
+.history-item img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(31, 58, 46, 0.08);
+}
+
+.history-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  background: var(--leaf);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 6px;
+}
+
+.history-badge.rotten {
+  background: var(--clay);
+}
+
+/* ===================================
+   MOBILE RESPONSIVENESS
+=================================== */
 
 @media (max-width: 576px) {
 
@@ -103,4 +327,15 @@
     object-fit: contain;
   }
 
+  .shelf-life-card {
+    padding: 16px;
+  }
+
+  .storage-options {
+    flex-direction: column;
+  }
+
+  .shelf-life-result h3 {
+    font-size: 22px;
+  }
 }

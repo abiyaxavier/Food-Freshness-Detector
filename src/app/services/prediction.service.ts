@@ -20,8 +20,7 @@ import { PredictionResponse } from '../models/prediction.model';
 export class PredictionService {
   // In production, move this to an environment file (environment.ts /
   // environment.prod.ts) so dev vs prod API URLs can differ.
-  private readonly apiUrl = 'http://localhost:8000/predict';
-
+  private apiUrl = `http://${window.location.hostname}:8000/predict`;
   constructor(private http: HttpClient) {}
 
   /**
