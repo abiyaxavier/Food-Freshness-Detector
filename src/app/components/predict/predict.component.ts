@@ -16,6 +16,7 @@ import { PredictionResponse, PredictionHistoryItem } from '../../models/predicti
 export class PredictComponent {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+  selectedFruit: 'auto' | 'apple' | 'banana' | 'orange' | 'other' = 'auto';
 
   result: PredictionResponse | null = null;
   isLoading = false;
@@ -26,11 +27,39 @@ export class PredictComponent {
 
   constructor(private predictionService: PredictionService) {}
 
+  selectFruit(fruit: 'auto' | 'apple' | 'banana' | 'orange' | 'other'): void {
+    this.selectedFruit = fruit;
+    if (this.result && fruit !== 'auto') {
+      const nameMap: Record<string, string> = {
+        apple: 'Apple',
+        banana: 'Banana',
+        orange: 'Orange',
+        other: 'Other Fruit'
+      };
+      const name = nameMap[fruit] || 'Fruit';
+      this.result = {
+        ...this.result,
+        fruit_name: name,
+        fruit_confidence: 'Selected by User',
+        is_supported: fruit !== 'other'
+      };
+    }
+  }
+
   get fruitName(): string {
     if (this.result?.fruit_name) {
       return this.result.fruit_name;
     }
-    return '';
+    if (this.selectedFruit !== 'auto') {
+      const map: Record<string, string> = {
+        apple: 'Apple',
+        banana: 'Banana',
+        orange: 'Orange',
+        other: 'Other Fruit'
+      };
+      return map[this.selectedFruit] || 'Fruit';
+    }
+    return 'Fruit';
   }
 
   get isFruitSupported(): boolean {
@@ -62,11 +91,21 @@ export class PredictComponent {
   }
 
   get fruitEmoji(): string {
-    const name = (this.result?.fruit_name || '').toLowerCase();
+    const name = (this.result?.fruit_name || this.selectedFruit || '').toLowerCase();
     if (name.includes('apple')) return '🍎';
     if (name.includes('banana')) return '🍌';
     if (name.includes('orange')) return '🍊';
     return '🌿';
+  }
+
+  get isRotten(): boolean {
+    const status = (this.result?.freshness || this.result?.prediction || '').toLowerCase();
+    return status === 'rotten';
+  }
+
+  get isFresh(): boolean {
+    const status = (this.result?.freshness || this.result?.prediction || '').toLowerCase();
+    return status === 'fresh';
   }
 
   get shelfLifeInfo(): { days: string; advice: string } {
@@ -74,16 +113,12 @@ export class PredictComponent {
       return { days: '', advice: '' };
     }
 
-    const isRotten =
-      this.result.freshness?.toLowerCase() === 'rotten' ||
-      this.result.prediction?.toLowerCase() === 'rotten';
-
-    if (isRotten) {
+    if (this.isRotten) {
       return {
         days: '0 Days',
         advice:
           this.result.storage_recommendation?.safety_caution ||
-          'This fruit shows signs of spoilage and is not safe to consume. Discard to prevent spreading mold.'
+          'This fruit shows signs of spoilage and is not safe to consume. Discard promptly to avoid contamination.'
       };
     }
 
@@ -166,6 +201,7 @@ export class PredictComponent {
   reset(): void {
     this.selectedFile = null;
     this.previewUrl = null;
+    this.selectedFruit = 'auto';
     this.result = null;
     this.errorMessage = '';
   }
@@ -187,29 +223,23 @@ export class PredictComponent {
     const currentFile = this.selectedFile;
     const currentPreviewUrl = this.previewUrl;
 
-    this.predictionService.predictImage(currentFile).subscribe({
+    this.predictionService.predictImage(currentFile, this.selectedFruit).subscribe({
       next: (response: PredictionResponse) => {
         console.log('Prediction response received:', response);
+        this.result = response;
 
-        const freshnessLabel =
-          (response.freshness || response.prediction || '').toLowerCase() === 'rotten'
-            ? 'Rotten'
-            : 'Fresh';
-
-        this.result = {
-          ...response,
-          prediction: freshnessLabel,
-          freshness: freshnessLabel
-        };
+        const freshnessLabel = response.freshness || response.prediction || 'Fresh';
+        const confidenceStr = response.freshness_confidence || response.confidence || '100%';
+        const fruitLabel = response.fruit_name || 'Fruit';
 
         this.history.unshift({
           id: Date.now(),
           fileName: currentFile.name,
           thumbnailUrl: currentPreviewUrl ?? '',
-          fruitName: response.fruit_name || 'Detected Fruit',
+          fruitName: fruitLabel,
           fruitConfidence: response.fruit_confidence,
           prediction: freshnessLabel,
-          confidence: response.freshness_confidence || response.confidence,
+          confidence: confidenceStr,
           timestamp: new Date()
         });
 
@@ -221,7 +251,6 @@ export class PredictComponent {
         this.isLoading = false;
 
         const detail = err.error?.detail;
-
         if (typeof detail === 'string') {
           this.errorMessage = detail;
         } else if (typeof err.error === 'string') {
@@ -229,7 +258,7 @@ export class PredictComponent {
         } else {
           this.errorMessage =
             `Prediction request failed (HTTP ${err.status || 'Connection Error'}). ` +
-            'Please verify that the FastAPI backend server is running.';
+            'Please verify that the FastAPI backend server is running on port 8000.';
         }
       }
     });

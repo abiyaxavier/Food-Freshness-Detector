@@ -74,3 +74,4 @@ yarn-error.log*
 # Required application models
 !backend/model_fruit_10.keras
 !backend/model_improved.keras
+!backend/model_fruit.keras

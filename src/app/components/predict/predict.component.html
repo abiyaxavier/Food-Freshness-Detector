@@ -7,17 +7,17 @@
     </p>
 
     <h1 class="text-center mb-3">
-      FreshEye — Automatic Fruit & Freshness Analysis
+      FreshEye — Fruit & Freshness Analysis
     </h1>
 
     <p class="text-center text-muted mb-5 max-w-600 mx-auto">
-      Upload or scan a fruit photo. FreshEye automatically identifies the fruit
-      type and evaluates whether it is fresh or rotten, without manual selection.
+      Upload or capture a fruit photo. FreshEye accurately evaluates fruit freshness
+      and detects fruit type, providing practical storage recommendations.
     </p>
 
     <div class="row justify-content-center gy-4">
 
-      <!-- IMAGE UPLOAD SECTION -->
+      <!-- IMAGE UPLOAD & SELECTION SECTION -->
       <div class="col-lg-6">
         <div class="card-organic p-4 h-100 d-flex flex-column justify-content-between">
 
@@ -38,8 +38,7 @@
                 </p>
 
                 <p class="text-muted small mb-3">
-                  Upload a photo of an apple, banana, orange, mango, grapes,
-                  strawberry, pineapple, watermelon, pear, or kiwi.
+                  Upload a photo of an apple, banana, orange, or other produce.
                   JPG, PNG, and WEBP formats supported (up to 10 MB).
                 </p>
               </ng-container>
@@ -96,35 +95,66 @@
 
             </div>
 
-            <!-- AUTOMATIC FRUIT IDENTIFICATION -->
-            <div class="auto-id-banner mt-4">
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="badge-ai-chip">
-                  <i class="bi bi-cpu-fill"></i>
-                  Auto-Detect
-                </span>
+            <!-- FRUIT TYPE SELECTION -->
+            <div class="fruit-selection mt-4">
+              <label class="fw-semibold mb-1 d-block text-dark">
+                🍎 Fruit Type
+              </label>
 
-                <span class="text-muted small">
-                  Fruit type is identified automatically by Stage 1 AI.
-                </span>
-              </div>
+              <p class="text-muted small mb-3">
+                Choose a fruit or keep <strong>Auto-Detect</strong> to let AI identify it.
+              </p>
 
-              <!-- ALL 10 SUPPORTED FRUITS -->
-              <div class="supported-fruits-hint mt-2 d-flex flex-wrap gap-2 align-items-center">
-                <span class="text-secondary small fw-medium">
-                  Supported classes:
-                </span>
+              <div class="d-flex gap-2 flex-wrap">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-fresh"
+                  [class.active-fruit]="selectedFruit === 'auto'"
+                  [disabled]="isLoading"
+                  (click)="selectFruit('auto')"
+                >
+                  🤖 Auto-Detect
+                </button>
 
-                <span class="badge bg-light text-dark border">🍎 Apple</span>
-                <span class="badge bg-light text-dark border">🍌 Banana</span>
-                <span class="badge bg-light text-dark border">🍊 Orange</span>
-                <span class="badge bg-light text-dark border">🥭 Mango</span>
-                <span class="badge bg-light text-dark border">🍇 Grapes</span>
-                <span class="badge bg-light text-dark border">🍓 Strawberry</span>
-                <span class="badge bg-light text-dark border">🍍 Pineapple</span>
-                <span class="badge bg-light text-dark border">🍉 Watermelon</span>
-                <span class="badge bg-light text-dark border">🍐 Pear</span>
-                <span class="badge bg-light text-dark border">🥝 Kiwi</span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-fresh"
+                  [class.active-fruit]="selectedFruit === 'apple'"
+                  [disabled]="isLoading"
+                  (click)="selectFruit('apple')"
+                >
+                  🍎 Apple
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-fresh"
+                  [class.active-fruit]="selectedFruit === 'banana'"
+                  [disabled]="isLoading"
+                  (click)="selectFruit('banana')"
+                >
+                  🍌 Banana
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-fresh"
+                  [class.active-fruit]="selectedFruit === 'orange'"
+                  [disabled]="isLoading"
+                  (click)="selectFruit('orange')"
+                >
+                  🍊 Orange
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-fresh"
+                  [class.active-fruit]="selectedFruit === 'other'"
+                  [disabled]="isLoading"
+                  (click)="selectFruit('other')"
+                >
+                  🍇 Other Produce
+                </button>
               </div>
             </div>
           </div>
@@ -140,12 +170,12 @@
               >
                 <span *ngIf="!isLoading">
                   <i class="bi bi-search me-2"></i>
-                  Analyze Fruit & Freshness
+                  Analyze Freshness
                 </span>
 
                 <span *ngIf="isLoading">
                   <span class="spinner-border spinner-border-sm me-2"></span>
-                  Processing AI Pipeline...
+                  Analyzing Image...
                 </span>
               </button>
 
@@ -198,8 +228,8 @@
             </h5>
 
             <p class="text-muted small mb-0 max-w-400">
-              Upload a fruit photo on the left. FreshEye will automatically
-              identify the fruit and classify its freshness, with storage advice.
+              Upload a fruit photo on the left. FreshEye will evaluate its
+              freshness and provide tailored storage advice.
             </p>
           </ng-container>
 
@@ -215,30 +245,12 @@
             </h5>
 
             <p class="text-muted small mb-0">
-              Stage 1: Fruit Identification<br />
-              Stage 2: Freshness Assessment
+              Evaluating fruit features and freshness indicators...
             </p>
           </ng-container>
 
           <!-- AI PREDICTION RESULT -->
           <ng-container *ngIf="result && !isLoading">
-
-            <!-- UNRECOGNIZED / UNSUPPORTED ALERT -->
-            <div
-              class="alert alert-warning w-100 text-start py-2 px-3 mb-3
-                     d-flex align-items-center gap-2"
-              *ngIf="!isFruitSupported"
-            >
-              <i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>
-
-              <div class="small">
-                <strong>Unrecognized or Low-Confidence Fruit:</strong>
-                {{ result.fruit_name }} ({{ result.fruit_confidence }}).
-
-                Supported fruits are Apple, Banana, Orange, Mango, Grapes,
-                Strawberry, Pineapple, Watermelon, Pear, and Kiwi.
-              </div>
-            </div>
 
             <!-- DETECTED FRUIT HEADER -->
             <div class="detected-fruit-banner w-100 mb-3 p-3 text-start">
@@ -249,11 +261,11 @@
 
                   <div>
                     <span class="text-muted small text-uppercase fw-bold letter-spacing-1">
-                      Identified Fruit Type
+                      Fruit Type
                     </span>
 
                     <h4 class="mb-0 fw-bold text-dark">
-                      {{ fruitName || 'Fruit' }}
+                      {{ fruitName }}
                     </h4>
                   </div>
                 </div>
@@ -268,7 +280,7 @@
                   </span>
 
                   <div class="text-muted extra-small mt-1">
-                    Fruit ID Confidence
+                    Fruit Identification
                   </div>
                 </div>
 
@@ -278,7 +290,7 @@
             <!-- FRESHNESS CONFIDENCE GAUGE -->
             <div
               class="gauge-wrap"
-              [class.rotten]="result.freshness === 'Rotten' || result.prediction === 'Rotten'"
+              [class.rotten]="isRotten"
             >
               <svg viewBox="0 0 120 120" class="gauge-svg">
                 <circle
@@ -304,7 +316,7 @@
                 </span>
 
                 <span class="gauge-caption">
-                  Freshness
+                  Confidence
                 </span>
               </div>
             </div>
@@ -312,26 +324,26 @@
             <!-- FRESHNESS STATUS -->
             <h2
               class="mt-3 mb-1 fw-bold"
-              [class.text-rotten]="result.freshness === 'Rotten' || result.prediction === 'Rotten'"
-              [class.text-fresh]="result.freshness === 'Fresh' || result.prediction === 'Fresh'"
+              [class.text-danger]="isRotten"
+              [class.text-success]="isFresh"
             >
               {{ result.freshness || result.prediction }}
             </h2>
 
             <p class="text-muted mb-0 small">
               {{
-                (result.freshness === 'Fresh' || result.prediction === 'Fresh')
+                isFresh
                   ? 'This fruit exhibits visual features consistent with freshness.'
-                  : 'This fruit exhibits signs of spoilage, browning, or rot.'
+                  : 'This fruit exhibits visual signs of spoilage, browning, or rot.'
               }}
             </p>
 
             <!-- TWO-STAGE METRICS -->
             <div class="d-flex gap-2 justify-content-center w-100 mt-3 flex-wrap">
               <div class="metric-pill">
-                <span class="text-muted small">Fruit ID:</span>
-                <strong class="ms-1">{{ result.fruit_name }}</strong>
-                <span class="text-secondary small ms-1">
+                <span class="text-muted small">Fruit:</span>
+                <strong class="ms-1">{{ fruitName }}</strong>
+                <span class="text-secondary small ms-1" *ngIf="result.fruit_confidence">
                   ({{ result.fruit_confidence }})
                 </span>
               </div>
@@ -341,7 +353,8 @@
 
                 <strong
                   class="ms-1"
-                  [class.text-danger]="result.freshness === 'Rotten'"
+                  [class.text-danger]="isRotten"
+                  [class.text-success]="isFresh"
                 >
                   {{ result.freshness || result.prediction }}
                 </strong>
@@ -365,7 +378,7 @@
               <!-- ROTTEN WARNING -->
               <div
                 class="rotten-warning-box p-3 mt-3 rounded-3"
-                *ngIf="result.freshness === 'Rotten' || result.prediction === 'Rotten'"
+                *ngIf="isRotten"
               >
                 <div class="d-flex align-items-start gap-2">
                   <i class="bi bi-x-octagon-fill text-danger fs-4 mt-1"></i>
@@ -385,7 +398,7 @@
               <!-- FRESH STORAGE GUIDELINES -->
               <div
                 class="fresh-storage-box mt-3"
-                *ngIf="result.freshness === 'Fresh' || result.prediction === 'Fresh'"
+                *ngIf="isFresh"
               >
 
                 <label class="storage-label d-block mb-2 text-secondary fw-semibold small">
@@ -453,8 +466,8 @@
 
               <!-- SAFETY DISCLAIMER -->
               <p class="shelf-disclaimer mt-3 mb-0 text-muted extra-small">
-                ⚠️ Estimates represent standard post-harvest conditions and do
-                not guarantee food safety. Inspect produce for texture, mold,
+                Note: Estimates represent standard post-harvest conditions and do
+                not guarantee food safety. Always inspect produce for texture, mold,
                 and odor before consumption.
               </p>
 
@@ -514,4 +527,3 @@
 
   </div>
 </section>
-

@@ -9,28 +9,22 @@ import { PredictionResponse } from '../models/prediction.model';
  * Purpose:
  *   Centralizes ALL communication with the FastAPI backend in one place.
  *   Components never call HttpClient directly — they call this service.
- *   This means if the API URL or request format ever changes, we only
- *   update it here, not in every component that needs predictions.
- *
- * @Injectable({ providedIn: 'root' })
- *   Registers this service as a single shared instance (singleton) for the
- *   whole app, without needing to list it in a module's `providers` array.
  */
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
-  // In production, move this to an environment file (environment.ts /
-  // environment.prod.ts) so dev vs prod API URLs can differ.
   private apiUrl = `http://${window.location.hostname}:8000/predict`;
   constructor(private http: HttpClient) {}
 
   /**
-   * Sends the selected image file to the backend as multipart/form-data
-   * (required because FastAPI's `UploadFile` expects a file upload, not JSON)
-   * and returns an Observable of the typed prediction response.
+   * Sends the selected image file to the backend as multipart/form-data.
+   * Optionally sends user-selected fruit ('auto', 'apple', 'banana', 'orange', 'other').
    */
-  predictImage(file: File): Observable<PredictionResponse> {
+  predictImage(file: File, fruit?: string): Observable<PredictionResponse> {
     const formData = new FormData();
-    formData.append('file', file); // key "file" MUST match FastAPI's `file: UploadFile` param name
+    formData.append('file', file);
+    if (fruit && fruit !== 'auto') {
+      formData.append('fruit', fruit);
+    }
 
     return this.http.post<PredictionResponse>(this.apiUrl, formData);
   }
