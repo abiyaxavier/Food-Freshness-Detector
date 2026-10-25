@@ -1,439 +1,237 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { PredictionService } from '../../services/prediction.service';
-
-import {
-  PredictionHistoryItem,
-  PredictionResponse
-} from '../../models/prediction.model';
-
-type FruitType = 'apple' | 'banana' | 'orange';
-type StorageCondition = 'room' | 'fridge';
-
-interface ShelfLifeInfo {
-  days: string;
-  advice: string;
-}
+import { PredictionResponse, PredictionHistoryItem } from '../../models/prediction.model';
 
 @Component({
   selector: 'app-predict',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './predict.component.html',
-  styleUrl: './predict.component.css',
+  styleUrls: ['./predict.component.css']
 })
-export class PredictComponent implements OnDestroy {
-
-  // ===================================
-  // VARIABLES
-  // ===================================
-
+export class PredictComponent {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
-  isLoading = false;
-  errorMessage: string | null = null;
-
   result: PredictionResponse | null = null;
+  isLoading = false;
+  errorMessage = '';
 
+  storageCondition: 'room' | 'fridge' = 'room';
   history: PredictionHistoryItem[] = [];
 
-  private historyCounter = 0;
-  private createdUrls = new Set<string>();
-
-  // ===================================
-  // FRUIT AND STORAGE SELECTION
-  // ===================================
-
-  selectedFruit: FruitType | null = null;
-
-  storageCondition: StorageCondition = 'room';
-
-  // ===================================
-  // CONSTRUCTOR
-  // ===================================
-
-  constructor(
-    private predictionService: PredictionService
-  ) {}
-
-  // ===================================
-  // SELECT FRUIT
-  // ===================================
-
-  selectFruit(fruit: FruitType): void {
-
-    if (this.isLoading) return;
-
-    if (this.selectedFruit !== fruit) {
-      this.selectedFruit = fruit;
-
-      // Previous prediction no longer applies
-      // to the newly selected fruit.
-      this.result = null;
-      this.errorMessage = null;
-    }
-  }
-
-  // ===================================
-  // SELECT STORAGE
-  // ===================================
-
-  selectStorage(condition: StorageCondition): void {
-    this.storageCondition = condition;
-  }
-
-  // ===================================
-  // GET FRUIT NAME
-  // ===================================
+  constructor(private predictionService: PredictionService) {}
 
   get fruitName(): string {
-
-    if (!this.selectedFruit) {
-      return 'Not selected';
+    if (this.result?.fruit_name) {
+      return this.result.fruit_name;
     }
-
-    return (
-      this.selectedFruit.charAt(0).toUpperCase() +
-      this.selectedFruit.slice(1)
-    );
+    return '';
   }
 
-  // ===================================
-  // SHELF LIFE GUIDANCE
-  // ===================================
-
-  get shelfLifeInfo(): ShelfLifeInfo {
-
-    if (!this.result || !this.selectedFruit) {
-      return {
-        days: 'Not available',
-        advice: ''
-      };
+  get isFruitSupported(): boolean {
+    if (!this.result) {
+      return true;
     }
-
-    const prediction = this.result.prediction.toLowerCase();
-
-    if (prediction === 'rotten') {
-      return {
-        days: 'Not applicable',
-        advice:
-          'Possible spoilage detected. Do not eat fruit showing mold, decay, or other clear signs of spoilage.'
-      };
+    if (this.result.is_supported === false) {
+      return false;
     }
-
-    if (prediction !== 'fresh') {
-      return {
-        days: 'Not available',
-        advice: 'Unable to interpret the freshness prediction.'
-      };
-    }
-
-    const shelfLife: Record<
-      FruitType,
-      {
-        room: string;
-        fridge: string;
-        advice: string;
-      }
-    > = {
-
-      apple: {
-        room: 'About 5–7 days',
-        fridge: 'About 4–6 weeks',
-        advice:
-          'Store apples in a cool place. Refrigeration generally helps preserve freshness longer.'
-      },
-
-      banana: {
-        room: 'About 2–7 days',
-        fridge: 'Depends on ripeness',
-        advice:
-          'Keep unripe bananas at room temperature. Refrigerate ripe bananas to slow further ripening.'
-      },
-
-      orange: {
-        room: 'About 5–7 days',
-        fridge: 'About 2–3 weeks',
-        advice:
-          'Store oranges in a cool, dry place or refrigerate for longer storage.'
-      }
-
-    };
-
-    const fruit = shelfLife[this.selectedFruit];
-
-    return {
-      days: fruit[this.storageCondition],
-      advice: fruit.advice
-    };
+    const nameLower = (this.result.fruit_name || '').toLowerCase();
+    return !nameLower.includes('unrecognized') && !nameLower.includes('unsupported') && !nameLower.includes('unidentified');
   }
 
-  // ===================================
-  // CAMERA AND GALLERY
-  // ===================================
+  get fruitConfidenceNumber(): number {
+    if (!this.result?.fruit_confidence) {
+      return 0;
+    }
+    const parsed = parseFloat(this.result.fruit_confidence);
+    return isNaN(parsed) ? 0 : Math.round(parsed);
+  }
+
+  get confidenceNumber(): number {
+    const raw = this.result?.freshness_confidence || this.result?.confidence;
+    if (!raw) {
+      return 0;
+    }
+    const parsed = parseFloat(raw);
+    return isNaN(parsed) ? 0 : Math.round(parsed);
+  }
+
+  get fruitEmoji(): string {
+    const name = (this.result?.fruit_name || '').toLowerCase();
+    if (name.includes('apple')) return '🍎';
+    if (name.includes('banana')) return '🍌';
+    if (name.includes('orange')) return '🍊';
+    return '🌿';
+  }
+
+  get shelfLifeInfo(): { days: string; advice: string } {
+    if (!this.result) {
+      return { days: '', advice: '' };
+    }
+
+    const isRotten =
+      this.result.freshness?.toLowerCase() === 'rotten' ||
+      this.result.prediction?.toLowerCase() === 'rotten';
+
+    if (isRotten) {
+      return {
+        days: '0 Days',
+        advice:
+          this.result.storage_recommendation?.safety_caution ||
+          'This fruit shows signs of spoilage and is not safe to consume. Discard to prevent spreading mold.'
+      };
+    }
+
+    const rec = this.result.storage_recommendation;
+    const isFridge = this.storageCondition === 'fridge';
+
+    if (rec) {
+      if (isFridge) {
+        return {
+          days: rec.shelf_life_days || '2 - 3 Weeks',
+          advice:
+            rec.refrigerated_advice ||
+            'Store in the crisper drawer to maintain firmness and moisture balance.'
+        };
+      } else {
+        return {
+          days: rec.shelf_life_days || '5 - 7 Days',
+          advice:
+            rec.room_temp_advice ||
+            'Store at room temperature out of direct sunlight in a cool, dry, well-ventilated spot.'
+        };
+      }
+    }
+
+    return isFridge
+      ? {
+          days: '1 - 2 Weeks',
+          advice: 'Store in the refrigerator crisper drawer to maximize shelf life.'
+        }
+      : {
+          days: '3 - 5 Days',
+          advice: 'Store at room temperature in a cool, dry area away from direct sunlight.'
+        };
+  }
 
   onFileSelected(event: Event): void {
-
     const input = event.target as HTMLInputElement;
-
     const file = input.files?.[0];
 
-    if (!file) return;
-
-    this.setFile(file);
-
-    // Allow selecting the same file again.
-    input.value = '';
-  }
-
-  // ===================================
-  // DRAG AND DROP
-  // ===================================
-
-  onDrop(event: DragEvent): void {
-
-    event.preventDefault();
-
-    if (this.isLoading) return;
-
-    const file = event.dataTransfer?.files?.[0];
-
-    if (file) {
-      this.setFile(file);
+    if (!file) {
+      return;
     }
+
+    this.handleFile(file);
   }
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
+    event.stopPropagation();
   }
 
-  // ===================================
-  // IMAGE VALIDATION
-  // ===================================
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-  private setFile(file: File): void {
-
-    if (this.isLoading) return;
-
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp'
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-
-      this.errorMessage =
-        'Please select a JPG, PNG, or WEBP image.';
-
-      return;
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      this.handleFile(file);
     }
+  }
 
-    const maxSize = 10 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-
-      this.errorMessage =
-        'Image is too large. Maximum size is 10 MB.';
-
+  private handleFile(file: File): void {
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please select a valid image file (JPG, PNG, or WEBP).';
+      this.selectedFile = null;
+      this.previewUrl = null;
       return;
-    }
-
-    // Release previous preview if it is
-    // not being used in prediction history.
-
-    if (
-      this.previewUrl &&
-      !this.history.some(
-        item => item.thumbnailUrl === this.previewUrl
-      )
-    ) {
-      this.releaseUrl(this.previewUrl);
     }
 
     this.selectedFile = file;
-
-    this.result = null;
-
-    this.errorMessage = null;
-
     this.previewUrl = URL.createObjectURL(file);
-
-    this.createdUrls.add(this.previewUrl);
+    this.result = null;
+    this.errorMessage = '';
   }
 
-  // ===================================
-  // AI PREDICTION
-  // ===================================
+  selectStorage(condition: 'room' | 'fridge'): void {
+    this.storageCondition = condition;
+  }
+
+  reset(): void {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.result = null;
+    this.errorMessage = '';
+  }
 
   predict(): void {
+    if (!this.selectedFile) {
+      this.errorMessage = 'Please select or upload a fruit image first.';
+      return;
+    }
 
-    if (
-      !this.selectedFile ||
-      !this.selectedFruit ||
-      this.isLoading
-    ) {
+    if (this.isLoading) {
       return;
     }
 
     this.isLoading = true;
-
-    this.errorMessage = null;
-
+    this.errorMessage = '';
     this.result = null;
 
-    const file = this.selectedFile;
+    const currentFile = this.selectedFile;
+    const currentPreviewUrl = this.previewUrl;
 
-    const thumbnailUrl = this.previewUrl;
-
-    this.predictionService.predictImage(file).subscribe({
-
+    this.predictionService.predictImage(currentFile).subscribe({
       next: (response: PredictionResponse) => {
+        console.log('Prediction response received:', response);
 
-        this.result = response;
+        const freshnessLabel =
+          (response.freshness || response.prediction || '').toLowerCase() === 'rotten'
+            ? 'Rotten'
+            : 'Fresh';
+
+        this.result = {
+          ...response,
+          prediction: freshnessLabel,
+          freshness: freshnessLabel
+        };
+
+        this.history.unshift({
+          id: Date.now(),
+          fileName: currentFile.name,
+          thumbnailUrl: currentPreviewUrl ?? '',
+          fruitName: response.fruit_name || 'Detected Fruit',
+          fruitConfidence: response.fruit_confidence,
+          prediction: freshnessLabel,
+          confidence: response.freshness_confidence || response.confidence,
+          timestamp: new Date()
+        });
 
         this.isLoading = false;
-
-        this.addToHistory(
-          response,
-          file,
-          thumbnailUrl
-        );
       },
 
       error: (err: HttpErrorResponse) => {
-
+        console.error('Prediction error:', err);
         this.isLoading = false;
 
         const detail = err.error?.detail;
 
-        this.errorMessage =
-          typeof detail === 'string'
-            ? detail
-            : 'Prediction failed. Please check the backend connection.';
+        if (typeof detail === 'string') {
+          this.errorMessage = detail;
+        } else if (typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else {
+          this.errorMessage =
+            `Prediction request failed (HTTP ${err.status || 'Connection Error'}). ` +
+            'Please verify that the FastAPI backend server is running.';
+        }
       }
-
     });
   }
-
-  // ===================================
-  // PREDICTION HISTORY
-  // ===================================
-
-  private addToHistory(
-    response: PredictionResponse,
-    file: File,
-    thumbnailUrl: string | null
-  ): void {
-
-    if (!thumbnailUrl) return;
-
-    this.history.unshift({
-
-      id: this.historyCounter++,
-
-      fileName: file.name,
-
-      thumbnailUrl: thumbnailUrl,
-
-      prediction: response.prediction,
-
-      confidence: response.confidence,
-
-      timestamp: new Date(),
-
-    });
-
-    // Keep only the latest 8 predictions.
-
-    const removedItems = this.history.splice(8);
-
-    for (const item of removedItems) {
-
-      if (item.thumbnailUrl !== this.previewUrl) {
-        this.releaseUrl(item.thumbnailUrl);
-      }
-    }
-  }
-
-  // ===================================
-  // CLEAR SELECTED IMAGE
-  // ===================================
-
-  reset(): void {
-
-    if (
-      this.previewUrl &&
-      !this.history.some(
-        item => item.thumbnailUrl === this.previewUrl
-      )
-    ) {
-      this.releaseUrl(this.previewUrl);
-    }
-
-    this.selectedFile = null;
-
-    this.previewUrl = null;
-
-    this.result = null;
-
-    this.errorMessage = null;
-
-    this.selectedFruit = null;
-
-    this.storageCondition = 'room';
-  }
-
-  // ===================================
-  // RELEASE TEMPORARY IMAGE URL
-  // ===================================
-
-  private releaseUrl(url: string): void {
-
-    if (this.createdUrls.has(url)) {
-
-      URL.revokeObjectURL(url);
-
-      this.createdUrls.delete(url);
-    }
-  }
-
-  // ===================================
-  // COMPONENT CLEANUP
-  // ===================================
-
-  ngOnDestroy(): void {
-
-    for (const url of this.createdUrls) {
-      URL.revokeObjectURL(url);
-    }
-
-    this.createdUrls.clear();
-  }
-
-  // ===================================
-  // CONFIDENCE GAUGE
-  // ===================================
-
-  get confidenceNumber(): number {
-
-    if (!this.result) return 0;
-
-    const value = parseFloat(
-      String(this.result.confidence)
-    );
-
-    if (!Number.isFinite(value)) {
-      return 0;
-    }
-
-    return Math.max(
-      0,
-      Math.min(100, value)
-    );
-  }
-
 }

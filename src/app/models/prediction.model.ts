@@ -1,25 +1,34 @@
-/**
- * prediction.model.ts
- *
- * Purpose:
- *   TypeScript interfaces describing the shape of data flowing between the
- *   Angular frontend and the FastAPI backend. Using typed interfaces (instead
- *   of `any`) catches typos and mismatches at compile time, e.g. if the
- *   backend field were ever renamed from `prediction` to `label`.
- */
-
-/** Exact JSON shape returned by POST /predict */
-export interface PredictionResponse {
-  prediction: 'Fresh' | 'Rotten';
-  confidence: string; // e.g. "98.7%"
+export interface StorageRecommendation {
+  ideal_storage?: string;
+  shelf_life_days?: string;
+  room_temp_advice?: string;
+  refrigerated_advice?: string;
+  handling_tips?: string;
+  safety_caution?: string;
+  supported_fruits?: string[];
+  is_supported?: boolean;
 }
 
-/** One entry in the local prediction history log shown on the Predict page */
+export interface PredictionResponse {
+  fruit_name?: string;
+  fruit_confidence?: string;
+  freshness: string;
+  freshness_confidence?: string;
+  storage_recommendation?: StorageRecommendation;
+  is_supported?: boolean;
+
+  // Backward compatibility fields
+  prediction: string;
+  confidence: string;
+}
+
 export interface PredictionHistoryItem {
   id: number;
   fileName: string;
   thumbnailUrl: string;
-  prediction: 'Fresh' | 'Rotten';
+  fruitName?: string;
+  fruitConfidence?: string;
+  prediction: string;
   confidence: string;
   timestamp: Date;
 }

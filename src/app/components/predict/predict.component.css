@@ -339,3 +339,93 @@
     font-size: 22px;
   }
 }
+
+/* ===================================
+   AUTO IDENTIFICATION & NEW UI ELEMENTS
+=================================== */
+
+.auto-id-banner {
+  background: #f1f8ed;
+  border: 1px solid #d9ebd1;
+  padding: 14px 18px;
+  border-radius: 12px;
+}
+
+.badge-ai-chip {
+  background: #285943;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detected-fruit-banner {
+  background: #f4faf1;
+  border: 1px solid #d5ebd0;
+  border-radius: 14px;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 0.05em;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+
+.max-w-600 {
+  max-width: 600px;
+}
+
+.max-w-400 {
+  max-width: 400px;
+}
+
+.text-fresh {
+  color: #285943;
+}
+
+.text-rotten {
+  color: #b24131;
+}
+
+.metric-pill {
+  background: #f5f8f5;
+  border: 1px solid #e1ebe0;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+}
+
+.storage-toggle-btn {
+  border: 1px solid rgba(40, 89, 67, 0.2);
+  background: white;
+  color: #375e43;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.storage-toggle-btn.active {
+  background: #285943;
+  color: white;
+  border-color: #285943;
+}
+
+.rotten-warning-box {
+  background: #fdf2f0;
+  border: 1px solid #f8d4cf;
+}
+
+.history-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}

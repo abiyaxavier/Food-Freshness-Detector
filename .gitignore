@@ -71,3 +71,6 @@ yarn-error.log*
 *.bak
 *.swp
 *.zip
+# Required application models
+!backend/model_fruit_10.keras
+!backend/model_improved.keras
